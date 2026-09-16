@@ -30,8 +30,16 @@ export interface CalendarMonthNavProps {
  */
 function CalendarMonthNav(): ReactElement {
   const { navProps } = useCalendarViewContext();
-  const { styles, panelMonth, calendarToday, selectedDate, weekOffset, onGoToToday, onPrevMonth, onNextMonth } =
-    navProps;
+  const {
+    styles,
+    panelMonth,
+    calendarToday,
+    selectedDate,
+    weekOffset,
+    onGoToToday,
+    onPrevMonth,
+    onNextMonth,
+  } = navProps;
   const isTodaySelected = selectedDate.isSame(calendarToday, 'date');
 
   return (
