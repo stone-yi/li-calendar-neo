@@ -57,7 +57,7 @@ jobs:
         run: |
           # 获取当前标签和前一个标签
           CURRENT_TAG="${{ github.event.inputs.tag || github.ref_name }}"
-          PREV_TAG=$(git tag -l 'v*' --sort=-version:refname | grep -v "$CURRENT_TAG" | head -1)
+          PREV_TAG=$(git tag -l 'v*' --sort=-version:refname | grep -v "$CURRENT_TAG" | head -1 || true)
 
           if [ -n "$PREV_TAG" ]; then
             LOG_RANGE="${PREV_TAG}..${CURRENT_TAG}"
