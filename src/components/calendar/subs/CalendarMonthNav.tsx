@@ -15,6 +15,8 @@ export interface CalendarMonthNavProps {
   calendarToday: Dayjs;
   /** 当前选中的日期，与 calendarToday 比较决定是否显示「今」按钮 */
   selectedDate: Dayjs;
+  /** 鼠标滚轮产生的周偏移量 */
+  weekOffset: number;
   /** 选中今天并跳到当月 */
   onGoToToday: () => void;
   /** 上一个月 */
@@ -28,7 +30,7 @@ export interface CalendarMonthNavProps {
  */
 function CalendarMonthNav(): ReactElement {
   const { navProps } = useCalendarViewContext();
-  const { styles, panelMonth, calendarToday, selectedDate, onGoToToday, onPrevMonth, onNextMonth } =
+  const { styles, panelMonth, calendarToday, selectedDate, weekOffset, onGoToToday, onPrevMonth, onNextMonth } =
     navProps;
   const isTodaySelected = selectedDate.isSame(calendarToday, 'date');
 
@@ -38,7 +40,7 @@ function CalendarMonthNav(): ReactElement {
         {panelMonth.year()}年{panelMonth.month() + 1}月
       </div>
       <div className={styles.navBtns}>
-        {!isTodaySelected && (
+        {(!isTodaySelected || weekOffset !== 0) && (
           <Tooltip title="回到今天">
             <Button
               autoInsertSpace={false}

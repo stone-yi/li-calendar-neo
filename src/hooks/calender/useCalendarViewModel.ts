@@ -149,6 +149,8 @@ export function useCalendarViewModel({
   const [calendarToday, setCalendarToday] = useState<Dayjs>(() => PENDING_BACKEND_TIME);
   /** 当前月网格展示的面板月份。 */
   const [panelMonth, setPanelMonth] = useState<Dayjs>(() => PENDING_BACKEND_TIME);
+  /** 鼠标滚轮产生的周偏移量（正=未来周，负=过去周）。 */
+  const [weekOffset, setWeekOffset] = useState(0);
 
   const calendarTodayRef = useRef<Dayjs>(PENDING_BACKEND_TIME);
   const selectedDateRef = useRef<Dayjs>(PENDING_BACKEND_TIME);
@@ -208,6 +210,7 @@ export function useCalendarViewModel({
   /** 返回今天，并同步把月份面板切回本月（本地时间）。 */
   const handleGoToToday = (): void => {
     const today = dayjs();
+    setWeekOffset(0);
     setCalendarToday(today);
     setSelectedDate(today);
     setPanelMonth(today.startOf('month'));
@@ -215,17 +218,20 @@ export function useCalendarViewModel({
 
   /** 切换到上一个月。 */
   const handlePrevMonth = (): void => {
+    setWeekOffset(0);
     setPanelMonth((m) => m.subtract(1, 'month'));
   };
 
   /** 切换到下一个月。 */
   const handleNextMonth = (): void => {
+    setWeekOffset(0);
     setPanelMonth((m) => m.add(1, 'month'));
   };
 
   /** 选中某一天，必要时同步切换月份面板。 */
   const handleSelectDate = (date: Dayjs): void => {
     setSelectedDate(date);
+    setWeekOffset(0);
     setPanelMonth((pm) => (date.month() !== pm.month() ? date.startOf('month') : pm));
   };
 
@@ -260,8 +266,10 @@ export function useCalendarViewModel({
       if (now - lastWheelTs < 150) return; // 节流：避免连续滚动时切换过快
       lastWheelTs = now;
       if (e.deltaY > 0) {
+        setWeekOffset((prev) => prev + 1);
         setPanelMonth((m) => m.subtract(1, 'week'));
       } else if (e.deltaY < 0) {
+        setWeekOffset((prev) => prev - 1);
         setPanelMonth((m) => m.add(1, 'week'));
       }
     };
@@ -358,6 +366,7 @@ export function useCalendarViewModel({
     panelMonth,
     calendarToday,
     selectedDate,
+    weekOffset,
     onGoToToday: handleGoToToday,
     onPrevMonth: handlePrevMonth,
     onNextMonth: handleNextMonth,
