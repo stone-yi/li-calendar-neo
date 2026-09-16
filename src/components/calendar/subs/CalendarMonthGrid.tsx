@@ -22,6 +22,8 @@ export interface CalendarMonthGridProps {
   showOverflowDates: boolean;
   /** 是否在左侧显示周数列 */
   showWeekNumbers: boolean;
+  /** 当前面板月份，用于生成动画 key */
+  panelMonth: Dayjs;
 }
 
 /**
@@ -29,79 +31,95 @@ export interface CalendarMonthGridProps {
  */
 function CalendarMonthGrid(): ReactElement {
   const { gridProps } = useCalendarViewContext();
-  const { styles, cellModels, weekdays, onSelectDate, showOverflowDates, showWeekNumbers } =
-    gridProps;
+  const {
+    styles,
+    cellModels,
+    weekdays,
+    onSelectDate,
+    showOverflowDates,
+    showWeekNumbers,
+    panelMonth,
+  } = gridProps;
 
   /** 动态网格列：有周数时左侧多一列 */
   const gridColumns = showWeekNumbers ? 'auto repeat(7, 1fr)' : 'repeat(7, 1fr)';
 
   return (
-    <div className={styles.calendarGrid} style={{ gridTemplateColumns: gridColumns }}>
-      {/* 表头：可选周数空位 + 星期 */}
-      {showWeekNumbers && <div className={styles.weekNumberHeader} />}
-      {weekdays.map((day, index) => (
-        <div
-          className={classNames(styles.weekday, {
-            [styles.weekdayWeekend]: day === '六' || day === '日',
-          })}
-          key={`${index}-${day}`}
-        >
-          {day}
-        </div>
-      ))}
-
-      {/* 6 行 × 7 列日期格子 */}
-      {Array.from({ length: 6 }, (_, rowIndex) => {
-        const rowCells = cellModels.slice(rowIndex * CELLS_PER_ROW, (rowIndex + 1) * CELLS_PER_ROW);
-        const rowKey = rowCells[0]?.dateKey ?? rowIndex;
-
-        return (
-          <div key={rowKey} style={{ display: 'contents' }}>
-            {/* 周数列 */}
-            {showWeekNumbers && (
-              <div className={styles.weekNumberCell}>{rowCells[0]?.date.isoWeek()}</div>
-            )}
-
-            {/* 日期格子 */}
-            {rowCells.map((cell) => {
-              /** 「休」「班」角标对应不同背景色 class */
-              const badgeClass =
-                cell.badgeVariant === 'rest'
-                  ? styles.tagRest
-                  : cell.badgeVariant === 'work'
-                    ? styles.tagWork
-                    : '';
-
-              if (!showOverflowDates && cell.isOtherMonth) {
-                return <div key={cell.dateKey} className={styles.cellPlaceholder} />;
-              }
-
-              return (
-                <Tooltip key={cell.dateKey} title={cell.tooltipTitle} mouseEnterDelay={0.5}>
-                  <button
-                    type="button"
-                    className={classNames(styles.cell, {
-                      [styles.otherMonth]: cell.isOtherMonth,
-                      [styles.today]: cell.isToday,
-                      [styles.selected]: cell.isSelected && !cell.isToday,
-                      [styles.weekend]: cell.date.day() === 0 || cell.date.day() === 6,
-                    })}
-                    onClick={() => onSelectDate(cell.date)}
-                  >
-                    {cell.badgeText && (
-                      <span className={classNames(styles.tag, badgeClass)}>{cell.badgeText}</span>
-                    )}
-                    <span className={styles.dateText}>{cell.date.date()}</span>
-                    <span className={classNames(styles.lunar, { [styles.term]: cell.hasJieQi })}>
-                      {cell.displayText}
-                    </span>
-                  </button>
-                </Tooltip>
-              );
+    <div className={styles.calendarGridWrap}>
+      <div
+        className={styles.calendarGrid}
+        key={panelMonth.format('YYYY-MM')}
+        style={{ gridTemplateColumns: gridColumns }}
+      >
+        {/* 表头：可选周数空位 + 星期 */}
+        {showWeekNumbers && <div className={styles.weekNumberHeader} />}
+        {weekdays.map((day, index) => (
+          <div
+            className={classNames(styles.weekday, {
+              [styles.weekdayWeekend]: day === '六' || day === '日',
             })}
+            key={`${index}-${day}`}
+          >
+            {day}
           </div>
-        );
-      })}
+        ))}
+
+        {/* 6 行 × 7 列日期格子 */}
+        {Array.from({ length: 6 }, (_, rowIndex) => {
+          const rowCells = cellModels.slice(
+            rowIndex * CELLS_PER_ROW,
+            (rowIndex + 1) * CELLS_PER_ROW,
+          );
+          const rowKey = rowCells[0]?.dateKey ?? rowIndex;
+
+          return (
+            <div key={rowKey} style={{ display: 'contents' }}>
+              {/* 周数列 */}
+              {showWeekNumbers && (
+                <div className={styles.weekNumberCell}>{rowCells[0]?.date.isoWeek()}</div>
+              )}
+
+              {/* 日期格子 */}
+              {rowCells.map((cell) => {
+                /** 「休」「班」角标对应不同背景色 class */
+                const badgeClass =
+                  cell.badgeVariant === 'rest'
+                    ? styles.tagRest
+                    : cell.badgeVariant === 'work'
+                      ? styles.tagWork
+                      : '';
+
+                if (!showOverflowDates && cell.isOtherMonth) {
+                  return <div key={cell.dateKey} className={styles.cellPlaceholder} />;
+                }
+
+                return (
+                  <Tooltip key={cell.dateKey} title={cell.tooltipTitle} mouseEnterDelay={0.5}>
+                    <button
+                      type="button"
+                      className={classNames(styles.cell, {
+                        [styles.otherMonth]: cell.isOtherMonth,
+                        [styles.today]: cell.isToday,
+                        [styles.selected]: cell.isSelected && !cell.isToday,
+                        [styles.weekend]: cell.date.day() === 0 || cell.date.day() === 6,
+                      })}
+                      onClick={() => onSelectDate(cell.date)}
+                    >
+                      {cell.badgeText && (
+                        <span className={classNames(styles.tag, badgeClass)}>{cell.badgeText}</span>
+                      )}
+                      <span className={styles.dateText}>{cell.date.date()}</span>
+                      <span className={classNames(styles.lunar, { [styles.term]: cell.hasJieQi })}>
+                        {cell.displayText}
+                      </span>
+                    </button>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

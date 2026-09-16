@@ -16,6 +16,8 @@ export function createCalendarGridStyles(ctx: CalendarViewStyleContext) {
   const today = css`
     background: var(--accent);
     color: ${isDark ? '#000000' : '#ffffff'};
+    font-weight: 700;
+    box-shadow: 0 2px 8px ${isDark ? 'rgba(96, 205, 255, 0.4)' : 'rgba(0, 103, 192, 0.35)'};
 
     .${cx(lunar)} {
       color: ${isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.9)'};
@@ -38,6 +40,10 @@ export function createCalendarGridStyles(ctx: CalendarViewStyleContext) {
       gap: 1px;
       justify-items: center;
       align-items: center;
+      animation: calendarSlideIn 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    `,
+    calendarGridWrap: css`
+      overflow: hidden;
     `,
     weekday: css`
       text-align: center;

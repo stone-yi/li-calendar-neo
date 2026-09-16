@@ -379,6 +379,7 @@ export function useCalendarViewModel({
     onSelectDate: handleSelectDate,
     showOverflowDates,
     showWeekNumbers,
+    panelMonth,
   };
 
   const footerProps: CalendarFooterProps | null = hasFooterContent
