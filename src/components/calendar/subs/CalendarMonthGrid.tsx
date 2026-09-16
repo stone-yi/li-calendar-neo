@@ -22,8 +22,10 @@ export interface CalendarMonthGridProps {
   showOverflowDates: boolean;
   /** 是否在左侧显示周数列 */
   showWeekNumbers: boolean;
-  /** 当前面板月份，用于生成动画 key */
+  /** 当前面板月份 */
   panelMonth: Dayjs;
+  /** 滚动计数器，每次滚轮切换递增，用于触发动画 key */
+  scrollTick: number;
 }
 
 /**
@@ -39,6 +41,7 @@ function CalendarMonthGrid(): ReactElement {
     showOverflowDates,
     showWeekNumbers,
     panelMonth,
+    scrollTick,
   } = gridProps;
 
   /** 动态网格列：有周数时左侧多一列 */
@@ -48,7 +51,7 @@ function CalendarMonthGrid(): ReactElement {
     <div className={styles.calendarGridWrap}>
       <div
         className={styles.calendarGrid}
-        key={panelMonth.format('YYYY-MM')}
+        key={`grid-${scrollTick}-${panelMonth.format('YYYY-MM')}`}
         style={{ gridTemplateColumns: gridColumns }}
       >
         {/* 表头：可选周数空位 + 星期 */}

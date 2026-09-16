@@ -14,10 +14,13 @@ export function createCalendarGridStyles(ctx: CalendarViewStyleContext) {
     font-weight: 600;
   `;
   const today = css`
-    background: var(--accent);
-    color: ${isDark ? '#000000' : '#ffffff'};
-    font-weight: 700;
-    box-shadow: 0 2px 8px ${isDark ? 'rgba(96, 205, 255, 0.4)' : 'rgba(0, 103, 192, 0.35)'};
+    && {
+      background: var(--accent) !important;
+      color: ${isDark ? '#000000' : '#ffffff'} !important;
+      font-weight: 700;
+      box-shadow: 0 2px 8px ${isDark ? 'rgba(96, 205, 255, 0.5)' : 'rgba(0, 103, 192, 0.45)'};
+      border: 2px solid ${isDark ? 'rgba(96, 205, 255, 0.7)' : 'rgba(0, 103, 192, 0.6)'};
+    }
 
     .${cx(lunar)} {
       color: ${isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.9)'};
@@ -29,7 +32,7 @@ export function createCalendarGridStyles(ctx: CalendarViewStyleContext) {
 
     /* 覆盖 .cell 的灰底 hover：保持强调色底，整体略提亮作为反馈（不叠灰底） */
     &:hover {
-      background: var(--accent);
+      background: var(--accent) !important;
       filter: brightness(1.07);
     }
   `;

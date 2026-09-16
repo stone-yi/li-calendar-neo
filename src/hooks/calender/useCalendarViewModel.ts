@@ -151,6 +151,8 @@ export function useCalendarViewModel({
   const [panelMonth, setPanelMonth] = useState<Dayjs>(() => PENDING_BACKEND_TIME);
   /** 鼠标滚轮产生的周偏移量（正=未来周，负=过去周）。 */
   const [weekOffset, setWeekOffset] = useState(0);
+  /** 滚动计数器，每次滚轮切换递增，用于触发动画 key。 */
+  const [scrollTick, setScrollTick] = useState(0);
 
   const calendarTodayRef = useRef<Dayjs>(PENDING_BACKEND_TIME);
   const selectedDateRef = useRef<Dayjs>(PENDING_BACKEND_TIME);
@@ -267,9 +269,11 @@ export function useCalendarViewModel({
       lastWheelTs = now;
       if (e.deltaY > 0) {
         setWeekOffset((prev) => prev + 1);
+        setScrollTick((prev) => prev + 1);
         setPanelMonth((m) => m.subtract(1, 'week'));
       } else if (e.deltaY < 0) {
         setWeekOffset((prev) => prev - 1);
+        setScrollTick((prev) => prev + 1);
         setPanelMonth((m) => m.add(1, 'week'));
       }
     };
@@ -380,6 +384,7 @@ export function useCalendarViewModel({
     showOverflowDates,
     showWeekNumbers,
     panelMonth,
+    scrollTick,
   };
 
   const footerProps: CalendarFooterProps | null = hasFooterContent
